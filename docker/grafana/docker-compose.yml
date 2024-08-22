@@ -1,0 +1,83 @@
+networks:
+  loki:
+
+services:
+  loki:
+    image: grafana/loki:2.9.10
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - loki
+
+  promtail:
+    image: grafana/promtail:2.9.10
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - loki
+
+  tempo:
+    image: grafana/tempo:2.4.1
+    restart: on-failure
+    command:
+      - "-storage.trace.backend=local"                  # tell tempo where to permanently put traces
+      - "-storage.trace.local.path=/tmp/tempo/traces"
+      - "-storage.trace.wal.path=/tmp/tempo/wal"        # tell tempo where to store the wal
+      - "-auth.enabled=false"                           # disables the requirement for the X-Scope-OrgID header
+      - "-server.http-listen-port=3200"
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+      - "4318:4318"
+
+  alloy:
+    image: grafana/alloy:v1.3.1
+    pull_policy: always
+    ports:
+      - "12345:12345"
+    environment:
+      REMOTE_WRITE_HOST: mimir:9009
+      LOKI_HOST: loki:3100
+      TEMPO_HOST: tempo:4317
+      PYROSCOPE_HOST: pyroscope:4040
+    depends_on:
+      - loki
+      - tempo
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --server.http.listen-addr=0.0.0.0:12345
+    networks:
+      - loki
+
+  grafana:
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy
+          orgId: 1
+          url: http://loki:3100
+          basicAuth: false
+          isDefault: true
+          version: 1
+          editable: false
+        EOF
+        /run.sh
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - loki
