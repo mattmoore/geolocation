@@ -1,10 +1,9 @@
-package geolocation
+package geolocation.http
 
 import cats.*
 import cats.effect.*
 import cats.effect.std.Console
 import fs2.io.net.Network
-import geolocation.http.ServerResource
 import geolocation.services.GeolocationService
 import geolocation.services.HelloService
 import org.http4s.server.Server
@@ -16,8 +15,9 @@ import org.typelevel.otel4s.oteljava.context.Context
 import org.typelevel.otel4s.trace.Tracer
 import skunk.Session
 
-import domain.*
-import repositories.*
+import geolocation.domain.*
+import geolocation.repositories.*
+import geolocation.*
 
 object Resources {
   def make[F[_]: Async: LiftIO: Console: Network]: Resource[F, Server] =

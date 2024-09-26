@@ -37,7 +37,7 @@ object GeolocationServiceSuite extends IOSuite {
           password = postgresContainer.password,
           database = postgresContainer.databaseName,
           maxConnections = 10,
-          migrationsLocation = "filesystem:../http/src/main/resources/db",
+          migrationsLocation = "filesystem:../core/src/main/resources/db",
         ),
       )
       _ <- Migrations.migrate(config.databaseConfig)

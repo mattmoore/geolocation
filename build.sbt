@@ -19,12 +19,30 @@ lazy val root = (project in file("."))
     integrationTests,
   )
 
+lazy val core = (project in file("core"))
+  .enablePlugins(
+    JavaAgent,
+    JavaAppPackaging,
+    DockerPlugin,
+  )
+  .settings(
+    name := "geolocation-core",
+    libraryDependencies ++= Dependencies.Projects.geolocation,
+    testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
+    fork                       := true,
+    coverageHighlighting       := true,
+    coverageFailOnMinimum      := true,
+    coverageMinimumStmtTotal   := 10,
+    coverageMinimumBranchTotal := 10,
+  )
+
 lazy val http = (project in file("http"))
   .enablePlugins(
     JavaAgent,
     JavaAppPackaging,
     DockerPlugin,
   )
+  .dependsOn(core)
   .settings(
     name := "geolocation-http",
     libraryDependencies ++= Dependencies.Projects.geolocation,
@@ -46,13 +64,13 @@ lazy val http = (project in file("http"))
   )
 
 lazy val integrationTests = (project in file("integration-tests"))
-  .dependsOn(http % "compile->compile;test->test")
+  .dependsOn(core % "compile->compile;test->test")
   .settings(
     libraryDependencies ++= Dependencies.Projects.integrationTests,
     fork := true,
   )
 
-addCommandAlias("test", "coverageOn; http/test; coverageAggregate; coverageOff")
+addCommandAlias("test", "coverageOn; core/test; http/test; coverageAggregate; coverageOff")
 addCommandAlias("formatAll", "scalafmtAll; scalafmtSbt")
 
 lazy val welcomeSettings = Seq(

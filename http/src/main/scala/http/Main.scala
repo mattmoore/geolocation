@@ -1,4 +1,4 @@
-package geolocation
+package geolocation.http
 
 import cats.effect.*
 import cats.syntax.all.*
