@@ -29,7 +29,7 @@ services:
       #OTEL_TRACES_EXPORTER: logging
       #OTEL_METRICS_EXPORTER: logging
       #OTEL_LOGS_EXPORTER: logging
-      OTEL_SERVICE_NAME: geolocation
+      OTEL_SERVICE_NAME: geolocation-http
       OTEL_METRIC_EXPORT_INTERVAL: 15000
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"

@@ -45,18 +45,26 @@ lazy val http = (project in file("http"))
   .dependsOn(core)
   .settings(
     name := "geolocation-http",
-    libraryDependencies ++= Dependencies.Projects.geolocation,
+    libraryDependencies ++= Dependencies.Projects.geolocationHttp,
     testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
+    Compile / mainClass        := Some("geolocation.http.Main"),
     fork                       := true,
     coverageHighlighting       := true,
     coverageFailOnMinimum      := true,
     coverageMinimumStmtTotal   := 10,
     coverageMinimumBranchTotal := 10,
-    Docker / packageName       := "geolocation-http",
-    Docker / version           := "latest",
+    assemblyMergeStrategy := {
+      case PathList(ps @ _*) if ps.last == "module-info.class" => MergeStrategy.discard
+      case PathList(ps @ _*) if ps.last.contains("okio")       => MergeStrategy.first
+      case x                                                   => (ThisBuild / assemblyMergeStrategy).value(x)
+    },
+    Docker / packageName := "geolocation-http",
+    Docker / version     := "latest",
     dockerExposedPorts ++= Seq(8080),
-    dockerBaseImage                           := "openjdk:22",
-    javaAgents += "io.opentelemetry.javaagent" % "opentelemetry-javaagent" % "1.24.0",
+    dockerBaseImage := "openjdk:22",
+    javaAgents ++= Seq(
+      "io.opentelemetry.javaagent" % "opentelemetry-javaagent" % "1.24.0",
+    ),
     javaOptions ++= Seq(
       "-Dotel.java.global-autoconfigure.enabled=true",
       s"-Dotel.service.name=${name.value}",
