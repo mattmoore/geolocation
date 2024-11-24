@@ -133,6 +133,18 @@ services:
           access: proxy
           # UID should match the datasourceUid in derivedFields.
           #uid: my_jaeger_uid
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://prometheus:9090
+          jsonData:
+            httpMethod: POST
+            manageAlerts: true
+            prometheusType: Prometheus
+            prometheusVersion: 2.44.0
+            cacheLevel: 'High'
+            disableRecordingRules: false
+            incrementalQueryOverlapWindow: 10m
         - name: Geolocation Postgres
           type: postgres
           url: geolocation-postgres:5432
