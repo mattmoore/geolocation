@@ -87,7 +87,7 @@ lazy val welcomeSettings = Seq(
   usefulTasks := Seq(
     UsefulTask("welcome", "Display this welcome menu.").alias("w"),
     UsefulTask("reload", "Reload sbt.").alias("r"),
-    UsefulTask("clean;compile", "Reload sbt.").alias("cc"),
+    UsefulTask("clean;compile", "Clean compile.").alias("cc"),
     UsefulTask("formatAll", "Format all Scala code.").alias("f"),
     UsefulTask("test", "Run geolocation unit tests with coverage.").alias("t"),
     UsefulTask("integrationTests/test", "Run geolocation integration tests.").alias("it"),

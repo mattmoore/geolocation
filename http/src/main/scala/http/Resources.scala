@@ -4,6 +4,10 @@ import cats.*
 import cats.effect.*
 import cats.effect.std.Console
 import fs2.io.net.Network
+import geolocation.*
+import geolocation.domain.*
+import geolocation.http.routes.MeteredRouter
+import geolocation.repositories.*
 import geolocation.services.GeolocationService
 import geolocation.services.HelloService
 import org.http4s.server.Server
@@ -14,10 +18,6 @@ import org.typelevel.otel4s.oteljava.OtelJava
 import org.typelevel.otel4s.oteljava.context.Context
 import org.typelevel.otel4s.trace.Tracer
 import skunk.Session
-
-import geolocation.domain.*
-import geolocation.repositories.*
-import geolocation.*
 
 object Resources {
   def make[F[_]: Async: LiftIO: Console: Network]: Resource[F, Server] =
@@ -42,6 +42,7 @@ object Resources {
       addressRepo: AddressRepository[F]         = AddressRepository(config, session)
       helloService: HelloService[F]             = HelloService.apply
       geolocationService: GeolocationService[F] = GeolocationService(addressRepo)
-      httpServer: Server <- ServerResource.make[F](config, helloService, geolocationService)
+      routes             <- MeteredRouter(helloService, geolocationService)
+      httpServer: Server <- ServerResource.make(config, routes)
     } yield httpServer
 }

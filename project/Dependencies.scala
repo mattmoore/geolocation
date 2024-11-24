@@ -28,6 +28,7 @@ object Dependencies {
       Http4s.http4sDsl,
       Http4s.http4sEmberServer,
       Http4s.http4sCirce,
+      Http4s.http4sPrometheusMetrics,
       Ip4s.ip4s,
       Logback.logback                % Runtime,
       Logback.logstashLogbackEncoder % Runtime,
@@ -97,12 +98,13 @@ object Dependencies {
   }
 
   object Http4s {
-    lazy val http4sCore        = "org.http4s" %% "http4s-core"         % Versions.http4s
-    lazy val http4sServer      = "org.http4s" %% "http4s-server"       % Versions.http4s
-    lazy val http4sEmberClient = "org.http4s" %% "http4s-ember-client" % Versions.http4s
-    lazy val http4sEmberServer = "org.http4s" %% "http4s-ember-server" % Versions.http4s
-    lazy val http4sDsl         = "org.http4s" %% "http4s-dsl"          % Versions.http4s
-    lazy val http4sCirce       = "org.http4s" %% "http4s-circe"        % Versions.http4s
+    lazy val http4sCore              = "org.http4s" %% "http4s-core"               % Versions.http4s
+    lazy val http4sServer            = "org.http4s" %% "http4s-server"             % Versions.http4s
+    lazy val http4sEmberClient       = "org.http4s" %% "http4s-ember-client"       % Versions.http4s
+    lazy val http4sEmberServer       = "org.http4s" %% "http4s-ember-server"       % Versions.http4s
+    lazy val http4sDsl               = "org.http4s" %% "http4s-dsl"                % Versions.http4s
+    lazy val http4sCirce             = "org.http4s" %% "http4s-circe"              % Versions.http4s
+    lazy val http4sPrometheusMetrics = "org.http4s" %% "http4s-prometheus-metrics" % Versions.http4sPrometheusMetrics
   }
 
   object Ip4s {
