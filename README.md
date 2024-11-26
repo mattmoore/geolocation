@@ -25,11 +25,11 @@ docker compose -f docker/geolocation/docker-compose.yml down
 Request GPS coordinates for an address:
 
 ```shell
-curl -v -X POST localhost:8080/coords -d '{"street": "123 Anywhere St.", "city": "New York", "state": "NY"}'
+curl -v -X POST http://localhost:8080/api/coords -d '{"street": "123 Anywhere St.", "city": "New York", "state": "NY"}'
 ```
 
 Create a new address:
 
 ```shell
-curl -v -X POST localhost:8080/coords/new -d '{"id": 3, "street": "123 Anywhere St.", "city": "New York", "state": "NY", "coords": { "lat": 10, "lon": 10 } }'
+curl -v -X POST http://localhost:8080/api/coords/new -d '{"id": 3, "street": "123 Anywhere St.", "city": "New York", "state": "NY", "coords": { "lat": 10, "lon": 10 } }'
 ```
