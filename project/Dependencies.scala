@@ -34,6 +34,8 @@ object Dependencies {
       Logback.logstashLogbackEncoder % Runtime,
       OpenTelemetry.opentelemetrySdkExtensionAutoconfigure,
       OpenTelemetry.opentelemetryExporterOtlp,
+      Prometheus.prometheusMetricsCore,
+      Prometheus.prometheusMetricsModel,
       Tpolecat.skunk,
       Typelevel.catsCore,
       Typelevel.catsEffect,
@@ -124,6 +126,11 @@ object Dependencies {
 
   object PostgreSql {
     lazy val postgresql = "org.postgresql" % "postgresql" % Versions.postgres
+  }
+
+  object Prometheus {
+    lazy val prometheusMetricsCore  = "io.prometheus" % "prometheus-metrics-core"  % "1.3.2"
+    lazy val prometheusMetricsModel = "io.prometheus" % "prometheus-metrics-model" % "1.3.2"
   }
 
   object Tpolecat {

@@ -9,9 +9,10 @@ import geolocation.services.*
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
+import io.prometheus.client.Counter
 import org.http4s.*
-import org.http4s.circe.CirceEntityDecoder.*
 import org.http4s.circe.*
+import org.http4s.circe.CirceEntityDecoder.*
 import org.http4s.dsl.*
 import org.typelevel.otel4s.trace.Tracer
 
@@ -19,6 +20,7 @@ object GeolocationRoutes {
   def apply[F[_]: Async: Tracer](
       dsl: Http4sDsl[F],
       geolocationService: GeolocationService[F],
+      byLocationAndStatus: Counter,
   ): HttpRoutes[F] = {
     import dsl.*
 
@@ -31,8 +33,19 @@ object GeolocationRoutes {
               .getCoords(request.toDomain)
               .flatMap {
                 case Right(coords) => Accepted(coords.asJson)
-                case Left(error)   => InternalServerError(error)
+                case Left(error)   => NotFound(error)
               }
+            _ <- Async[F].delay(
+              byLocationAndStatus
+                .labels(
+                  s"${req.pathInfo}",
+                  req.method.name,
+                  s"${response.status.code}",
+                  request.state,
+                  request.city,
+                )
+                .inc(),
+            )
           } yield response
         }.handleErrorWith(e => InternalServerError(e.getMessage))
 
