@@ -129,8 +129,8 @@ object Dependencies {
   }
 
   object Prometheus {
-    lazy val prometheusMetricsCore  = "io.prometheus" % "prometheus-metrics-core"  % "1.3.2"
-    lazy val prometheusMetricsModel = "io.prometheus" % "prometheus-metrics-model" % "1.3.2"
+    lazy val prometheusMetricsCore  = "io.prometheus" % "prometheus-metrics-core"  % Versions.prometheus
+    lazy val prometheusMetricsModel = "io.prometheus" % "prometheus-metrics-model" % Versions.prometheus
   }
 
   object Tpolecat {

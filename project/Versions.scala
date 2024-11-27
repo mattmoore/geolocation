@@ -17,6 +17,7 @@ object Versions {
   val otel4s                  = "0.8.0"
   val opentelemetry           = "1.38.0"
   val postgres                = "42.7.4"
+  val prometheus              = "1.3.2"
   val skunk                   = "1.0.0-M7"
   val slf4j                   = "2.0.16"
   val testContainers          = "0.41.4"
