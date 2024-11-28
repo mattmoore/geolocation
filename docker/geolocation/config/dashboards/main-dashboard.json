@@ -108,7 +108,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "(sum(geolocation_by_location_and_status_total{status=\"202\"}) / sum(geolocation_by_location_and_status_total)) * 100",
+          "expr": "sum without(status)(rate(geolocation_by_location_and_status_total{status=\"200\"}[1m]))/sum without(status)(rate(geolocation_by_location_and_status_total[1m])) * 100",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
