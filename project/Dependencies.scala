@@ -36,6 +36,13 @@ object Dependencies {
       OpenTelemetry.opentelemetryExporterOtlp,
       Prometheus.prometheusMetricsCore,
       Prometheus.prometheusMetricsModel,
+      Tapir.tapirCore,
+      Tapir.tapirHttp4sServer,
+      Tapir.tapirSwaggerUiBundle,
+      Tapir.tapirJsoniterScala,
+      Tapir.tapirJsonCirce,
+      Tapir.tapirPrometheusMetrics,
+      Tapir.jsoniterScalaMacro,
       Tpolecat.skunk,
       Typelevel.catsCore,
       Typelevel.catsEffect,
@@ -131,6 +138,16 @@ object Dependencies {
   object Prometheus {
     lazy val prometheusMetricsCore  = "io.prometheus" % "prometheus-metrics-core"  % Versions.prometheus
     lazy val prometheusMetricsModel = "io.prometheus" % "prometheus-metrics-model" % Versions.prometheus
+  }
+
+  object Tapir {
+    lazy val tapirCore              = "com.softwaremill.sttp.tapir"           %% "tapir-core"               % Versions.tapir
+    lazy val tapirHttp4sServer      = "com.softwaremill.sttp.tapir"           %% "tapir-http4s-server"      % Versions.tapir
+    lazy val tapirSwaggerUiBundle   = "com.softwaremill.sttp.tapir"           %% "tapir-swagger-ui-bundle"  % Versions.tapir
+    lazy val tapirJsoniterScala     = "com.softwaremill.sttp.tapir"           %% "tapir-jsoniter-scala"     % Versions.tapir
+    lazy val tapirJsonCirce         = "com.softwaremill.sttp.tapir"           %% "tapir-json-circe"         % Versions.tapir
+    lazy val tapirPrometheusMetrics = "com.softwaremill.sttp.tapir"           %% "tapir-prometheus-metrics" % Versions.tapir
+    lazy val jsoniterScalaMacro     = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros"    % Versions.jsoniterScalaMacro
   }
 
   object Tpolecat {

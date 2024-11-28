@@ -9,6 +9,7 @@ object Versions {
   val http4s                  = "0.23.27"
   val http4sPrometheusMetrics = "0.25.0"
   val ip4s                    = "3.6.0"
+  val jsoniterScalaMacro      = "2.30.15"
   val log4cats                = "2.7.0"
   val logback                 = "1.4.14"
   val logstashLogbackEncoder  = "8.0"
@@ -20,6 +21,7 @@ object Versions {
   val prometheus              = "1.3.2"
   val skunk                   = "1.0.0-M7"
   val slf4j                   = "2.0.16"
+  val tapir                   = "1.11.9"
   val testContainers          = "0.41.4"
   val weaver                  = "0.8.3"
 }
