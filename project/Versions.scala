@@ -6,6 +6,7 @@ object Versions {
   val ciris                   = "3.6.0"
   val flyway                  = "10.19.0"
   val fs2                     = "3.11.0"
+  val gatling                 = "3.13.1"
   val http4s                  = "0.23.27"
   val http4sPrometheusMetrics = "0.25.0"
   val ip4s                    = "3.6.0"

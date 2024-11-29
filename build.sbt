@@ -78,6 +78,14 @@ lazy val integrationTests = (project in file("integration-tests"))
     fork := true,
   )
 
+lazy val loadTests = (project in file("load-tests"))
+  .enablePlugins(GatlingPlugin)
+  .dependsOn(core % "compile->compile;test->test")
+  .settings(
+    libraryDependencies ++= Dependencies.Projects.loadTests,
+    fork := true,
+  )
+
 addCommandAlias("test", "coverageOn; core/test; http/test; coverageAggregate; coverageOff")
 addCommandAlias("formatAll", "scalafmtAll; scalafmtSbt")
 

@@ -66,6 +66,17 @@ object Dependencies {
       TestContainers.testContainersScala,
       TestContainers.testContainersScalaPostgresql,
     )
+
+    lazy val loadTests = Seq(
+      Flyway.flywayCore               % Test,
+      Flyway.flywayDatabasePostgresql % Test,
+      Gatling.gatlingCharts,
+      Gatling.gatlingTestFramework,
+      Logback.logback                % Runtime,
+      Logback.logstashLogbackEncoder % Runtime,
+      TestContainers.testContainersScala,
+      TestContainers.testContainersScalaPostgresql,
+    )
   }
 
   object Typelevel {
@@ -104,6 +115,11 @@ object Dependencies {
     lazy val fs2Io              = "co.fs2" %% "fs2-io"               % Versions.fs2
     lazy val fs2ReactiveStreams = "co.fs2" %% "fs2-reactive-streams" % Versions.fs2
     lazy val fs2Codec           = "co.fs2" %% "fs2-scodec"           % Versions.fs2
+  }
+
+  object Gatling {
+    lazy val gatlingCharts        = "io.gatling.highcharts" % "gatling-charts-highcharts" % Versions.gatling % "test"
+    lazy val gatlingTestFramework = "io.gatling"            % "gatling-test-framework"    % Versions.gatling % "test"
   }
 
   object Http4s {
