@@ -19,13 +19,19 @@ import sttp.tapir.server.metrics.Metric
 import scala.annotation.nowarn
 
 object CustomMetrics {
-  def extractBody[F[_]: Async](serverRequest: ServerRequest): F[String] = {
-    val underlying = serverRequest.underlying.asInstanceOf[Request[F]]
-    underlying
-      .bodyText(summon[RaiseThrowable[F]], underlying.charset.getOrElse(Charset.`UTF-8`))
-      .compile
-      .string
-  }
+  def extractRequestBodyString[F[_]: Async](serverRequest: ServerRequest): F[String] =
+    serverRequest.underlying match {
+      case underlying: Request[?] =>
+        for {
+          underlying <- underlying.asInstanceOf[Request[F]].pure
+          body <- underlying
+            .bodyText(summon[RaiseThrowable[F]], underlying.charset.getOrElse(Charset.`UTF-8`))
+            .compile
+            .string
+        } yield body
+      case _ =>
+        Async[F].raiseError(Throwable("Invalid underlying request type."))
+    }
 
   def geolocationByLocationAndStatusTotal[F[_]: Async]: Metric[F, Counter] = {
     val counter = Counter
@@ -51,7 +57,7 @@ object CustomMetrics {
       (method, path) match {
         case ("POST", "/api/coords") => {
           for {
-            bodyString <- extractBody(req)
+            bodyString <- extractRequestBodyString(req)
             parsed = decode[CoordsRequest](bodyString)
           } yield parsed match {
             case Left(error)    => counter.labelValues(path, method, status, "", "", "").inc()
