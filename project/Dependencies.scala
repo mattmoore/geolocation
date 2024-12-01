@@ -20,14 +20,14 @@ object Dependencies {
     lazy val geolocationHttp = Seq(
       Circe.circeCore,
       Circe.circeGeneric,
+      Circe.circeParser,
       Flyway.flywayCore,
       Flyway.flywayDatabasePostgresql % Runtime,
+      FS2.fs2Core,
       FS2.fs2Io,
       Http4s.http4sCore,
       Http4s.http4sServer,
-      Http4s.http4sDsl,
       Http4s.http4sEmberServer,
-      Http4s.http4sCirce,
       Http4s.http4sPrometheusMetrics,
       Ip4s.ip4s,
       Logback.logback                % Runtime,
@@ -36,12 +36,16 @@ object Dependencies {
       OpenTelemetry.opentelemetryExporterOtlp,
       Prometheus.prometheusMetricsCore,
       Prometheus.prometheusMetricsModel,
+      Prometheus.prometheusSimpleClient,
+      Tapir.tapirModelCore,
+      Tapir.tapirSharedCore,
+      Tapir.tapirSharedFs2,
       Tapir.tapirCore,
+      Tapir.tapirServer,
       Tapir.tapirHttp4sServer,
-      Tapir.tapirSwaggerUiBundle,
       Tapir.tapirJsoniterScala,
-      Tapir.tapirJsonCirce,
       Tapir.tapirPrometheusMetrics,
+      Tapir.jsoniterScalaCore,
       Tapir.jsoniterScalaMacro,
       Tpolecat.skunk,
       Typelevel.catsCore,
@@ -99,6 +103,7 @@ object Dependencies {
     lazy val circeCore    = "io.circe" %% "circe-core"    % Versions.circe
     lazy val circeGeneric = "io.circe" %% "circe-generic" % Versions.circe
     lazy val circeLiteral = "io.circe" %% "circe-literal" % Versions.circe
+    lazy val circeParser  = "io.circe" %% "circe-parser"  % Versions.circe
   }
 
   object Ciris {
@@ -154,16 +159,22 @@ object Dependencies {
   object Prometheus {
     lazy val prometheusMetricsCore  = "io.prometheus" % "prometheus-metrics-core"  % Versions.prometheus
     lazy val prometheusMetricsModel = "io.prometheus" % "prometheus-metrics-model" % Versions.prometheus
+    lazy val prometheusSimpleClient = "io.prometheus" % "simpleclient"             % Versions.prometheusSimpleClient
   }
 
   object Tapir {
+    lazy val tapirModelCore         = "com.softwaremill.sttp.model"           %% "core"                     % Versions.tapirModelCore
+    lazy val tapirSharedCore        = "com.softwaremill.sttp.shared"          %% "core"                     % Versions.tapirShared
+    lazy val tapirSharedFs2         = "com.softwaremill.sttp.shared"          %% "fs2"                      % Versions.tapirShared
     lazy val tapirCore              = "com.softwaremill.sttp.tapir"           %% "tapir-core"               % Versions.tapir
+    lazy val tapirServer            = "com.softwaremill.sttp.tapir"           %% "tapir-server"             % Versions.tapir
     lazy val tapirHttp4sServer      = "com.softwaremill.sttp.tapir"           %% "tapir-http4s-server"      % Versions.tapir
     lazy val tapirSwaggerUiBundle   = "com.softwaremill.sttp.tapir"           %% "tapir-swagger-ui-bundle"  % Versions.tapir
     lazy val tapirJsoniterScala     = "com.softwaremill.sttp.tapir"           %% "tapir-jsoniter-scala"     % Versions.tapir
     lazy val tapirJsonCirce         = "com.softwaremill.sttp.tapir"           %% "tapir-json-circe"         % Versions.tapir
     lazy val tapirPrometheusMetrics = "com.softwaremill.sttp.tapir"           %% "tapir-prometheus-metrics" % Versions.tapir
-    lazy val jsoniterScalaMacro     = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros"    % Versions.jsoniterScalaMacro
+    lazy val jsoniterScalaCore      = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"      % Versions.jsoniterScala
+    lazy val jsoniterScalaMacro     = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros"    % Versions.jsoniterScala
   }
 
   object Tpolecat {
