@@ -30,11 +30,11 @@ object MeteredRouter {
       .metricsInterceptor(prometheusMetrics.metricsInterceptor())
       .options
 
-    val routes = prometheusMetrics.metricsEndpoint +: (
+    val endpoints = prometheusMetrics.metricsEndpoint +: (
       HelloEndpoints(helloService) ++
         GeolocationEndpoints(geolocationService)
     )
 
-    Http4sServerInterpreter[F](serverOptions).toRoutes(routes)
+    Http4sServerInterpreter[F](serverOptions).toRoutes(endpoints)
   }
 }
