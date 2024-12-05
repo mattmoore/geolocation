@@ -9,6 +9,7 @@ import geolocation.domain.GpsCoords
 import geolocation.http.metrics.CustomMetrics.*
 import geolocation.http.requests.CoordsRequest
 import geolocation.http.requests.CreateAddressRequest
+import geolocation.http.routes.EndpointImplicits.*
 import geolocation.services.GeolocationService
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
@@ -23,6 +24,7 @@ object GeolocationEndpoints {
 
   def apply[F[_]: Async](geolocationService: GeolocationService[F]): List[ServerEndpoint[Any, F]] = List(
     endpoint.post
+      .metric(geolocationByLocationAndStatusTotal)
       .in("api" / "coords")
       .in(jsonBody[CoordsRequest])
       .out(jsonBody[GpsCoords])
