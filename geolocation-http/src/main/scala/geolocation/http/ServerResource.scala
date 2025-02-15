@@ -15,7 +15,7 @@ import Tracing.traced
 
 object ServerResource {
   def make[F[_]: {Async, Network, Tracer}](
-      config: Config,
+      config: AppConfig,
       routes: HttpRoutes[F],
   ): Resource[F, Server] =
     EmberServerBuilder

@@ -10,7 +10,8 @@ object Dependencies {
       Flyway.flywayCore,
       Ip4s.ip4s,
       PostgreSql.postgresql,
-      Tpolecat.doobie,
+      Doobie.doobieCore,
+      Doobie.doobieHikari,
       Typelevel.catsCore,
       Typelevel.catsEffect,
       Typelevel.log4catsCore,
@@ -52,7 +53,8 @@ object Dependencies {
       Tapir.tapirPrometheusMetrics,
       Tapir.jsoniterScalaCore,
       Tapir.jsoniterScalaMacro,
-      Tpolecat.doobie,
+      Doobie.doobieCore,
+      Doobie.doobieHikari,
       Typelevel.catsCore,
       Typelevel.catsEffect,
       Typelevel.catsEffectKernel,
@@ -182,8 +184,8 @@ object Dependencies {
     lazy val jsoniterScalaMacro     = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros"    % Versions.jsoniterScala
   }
 
-  object Tpolecat {
-    lazy val doobie         = "org.tpolecat" %% "doobie-core"     % Versions.doobie
+  object Doobie {
+    lazy val doobieCore     = "org.tpolecat" %% "doobie-core"     % Versions.doobie
     lazy val doobiePostgres = "org.tpolecat" %% "doobie-postgres" % Versions.doobie
     lazy val doobieHikari   = "org.tpolecat" %% "doobie-hikari"   % Versions.doobie
   }

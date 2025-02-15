@@ -5,6 +5,8 @@ import cats.effect.*
 import cats.effect.std.Console
 import fs2.io.net.Network
 import doobie.*
+import doobie.hikari.*
+import com.zaxxer.hikari.HikariConfig
 import geolocation.*
 import geolocation.domain.*
 import geolocation.repositories.*
@@ -27,7 +29,7 @@ import sttp.tapir.server.http4s.Http4sServerInterpreter
 object Resources {
   def make[F[_]: {Async, LiftIO, Console, Network}]: Resource[F, Server] =
     for {
-      config <- Config.load[F]
+      config <- AppConfig.load[F]
       serviceName = "geolocation"
       otel            <- OtelJava.autoConfigured[F]()
       given Meter[F]  <- Resource.eval(otel.meterProvider.get(serviceName))
@@ -37,13 +39,17 @@ object Resources {
       )
       prometheusMetrics <- Resource.eval(Async[F].delay(PrometheusMetrics.default[F]("geolocation")))
       migrationRunner   <- MigrationRunner(config.databaseConfig)
-      xa: Transactor[F] = Transactor.fromDriverManager[F](
-        driver = "org.postgresql.Driver",
-        url = s"jdbc:postgresql://${config.databaseConfig.host}:${config.databaseConfig.port}/geolocation",
-        user = config.databaseConfig.username,
-        password = config.databaseConfig.password,
-        logHandler = None,
-      )
+      xa: HikariTransactor[F] <- for {
+        c <- Resource.pure {
+          val hc = new HikariConfig
+          hc.setDriverClassName("org.postgresql.Driver")
+          hc.setJdbcUrl(s"jdbc:postgresql://${config.databaseConfig.host}:${config.databaseConfig.port}/geolocation")
+          hc.setUsername(config.databaseConfig.username)
+          hc.setPassword(config.databaseConfig.password)
+          hc
+        }
+        xa <- HikariTransactor.fromHikariConfig[F](c)
+      } yield xa
       addressRepo: AddressRepository[F]         = AddressRepository(config, xa)
       helloService: HelloService[F]             = HelloService.apply
       geolocationService: GeolocationService[F] = GeolocationService(addressRepo)

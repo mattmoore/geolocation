@@ -14,7 +14,7 @@ final case class DatabaseConfig(
     migrationsLocation: String = "db",
 )
 
-final case class Config(
+final case class AppConfig(
     port: Int,
     databaseConfig: DatabaseConfig,
 )
@@ -30,13 +30,13 @@ val databaseConfig: ConfigValue[Effect, DatabaseConfig] =
     env("DB_MIGRATIONS_LOCATION").as[String].default("db"),
   ).parMapN(DatabaseConfig.apply)
 
-val config: ConfigValue[Effect, Config] =
+val config: ConfigValue[Effect, AppConfig] =
   (
     env("PORT").as[Int].default(8080),
     databaseConfig,
-  ).parMapN(Config.apply)
+  ).parMapN(AppConfig.apply)
 
-object Config {
-  def load[F[_]: Async]: Resource[F, Config] =
+object AppConfig {
+  def load[F[_]: Async]: Resource[F, AppConfig] =
     Resource.eval(config.load)
 }

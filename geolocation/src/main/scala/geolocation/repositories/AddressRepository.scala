@@ -15,7 +15,7 @@ trait AddressRepository[F[_]] {
 
 object AddressRepository {
   def apply[F[_]: {Async, Console}](
-      config: Config,
+      config: AppConfig,
       xa: Transactor[F],
   ): AddressRepository[F] = new AddressRepository[F] {
     override def getByAddress(query: AddressQuery): F[Option[Address]] =
