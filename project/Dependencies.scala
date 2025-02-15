@@ -10,6 +10,7 @@ object Dependencies {
       Flyway.flywayCore,
       Ip4s.ip4s,
       PostgreSql.postgresql,
+      Tpolecat.doobie,
       Tpolecat.skunk,
       Typelevel.catsCore,
       Typelevel.catsEffect,
@@ -47,6 +48,7 @@ object Dependencies {
       Tapir.tapirPrometheusMetrics,
       Tapir.jsoniterScalaCore,
       Tapir.jsoniterScalaMacro,
+      Tpolecat.doobie,
       Tpolecat.skunk,
       Typelevel.catsCore,
       Typelevel.catsEffect,
@@ -178,7 +180,10 @@ object Dependencies {
   }
 
   object Tpolecat {
-    lazy val skunk = "org.tpolecat" %% "skunk-core" % Versions.skunk
+    lazy val doobie         = "org.tpolecat" %% "doobie-core"     % Versions.doobie
+    lazy val doobiePostgres = "org.tpolecat" %% "doobie-postgres" % Versions.doobie
+    lazy val doobieHikari   = "org.tpolecat" %% "doobie-hikari"   % Versions.doobie
+    lazy val skunk          = "org.tpolecat" %% "skunk-core"      % Versions.skunk
   }
 
   object TestContainers {

@@ -1,6 +1,6 @@
 import sbtwelcome.*
 
-ThisBuild / scalaVersion                        := "3.5.1"
+ThisBuild / scalaVersion                        := "3.6.3"
 ThisBuild / Test / parallelExecution            := true
 ThisBuild / githubWorkflowJavaVersions          := Seq(JavaSpec.temurin("22"))
 ThisBuild / githubWorkflowPublishTargetBranches := Seq()
@@ -15,18 +15,18 @@ lazy val root = (project in file("."))
     welcomeSettings,
   )
   .aggregate(
-    http,
+    geolocationHttp,
     integrationTests,
   )
 
-lazy val core = (project in file("core"))
+lazy val geolocation = (project in file("geolocation"))
   .enablePlugins(
     JavaAgent,
     JavaAppPackaging,
     DockerPlugin,
   )
   .settings(
-    name := "geolocation-core",
+    name := "geolocation",
     libraryDependencies ++= Dependencies.Projects.geolocation,
     testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
     fork                       := true,
@@ -36,13 +36,13 @@ lazy val core = (project in file("core"))
     coverageMinimumBranchTotal := 10,
   )
 
-lazy val http = (project in file("http"))
+lazy val geolocationHttp = (project in file("geolocation-http"))
   .enablePlugins(
     JavaAgent,
     JavaAppPackaging,
     DockerPlugin,
   )
-  .dependsOn(core)
+  .dependsOn(geolocation)
   .settings(
     name := "geolocation-http",
     libraryDependencies ++= Dependencies.Projects.geolocationHttp,
@@ -72,7 +72,7 @@ lazy val http = (project in file("http"))
   )
 
 lazy val integrationTests = (project in file("integration-tests"))
-  .dependsOn(core % "compile->compile;test->test")
+  .dependsOn(geolocation % "compile->compile;test->test")
   .settings(
     libraryDependencies ++= Dependencies.Projects.integrationTests,
     fork := true,
@@ -80,13 +80,13 @@ lazy val integrationTests = (project in file("integration-tests"))
 
 lazy val loadTests = (project in file("load-tests"))
   .enablePlugins(GatlingPlugin)
-  .dependsOn(core % "compile->compile;test->test")
+  .dependsOn(geolocation % "compile->compile;test->test")
   .settings(
     libraryDependencies ++= Dependencies.Projects.loadTests,
     fork := true,
   )
 
-addCommandAlias("test", "coverageOn; core/test; http/test; coverageAggregate; coverageOff")
+addCommandAlias("test", "coverageOn; geolocation/test; geolocationHttp/test; coverageAggregate; coverageOff")
 addCommandAlias("formatAll", "scalafmtAll; scalafmtSbt")
 
 lazy val welcomeSettings = Seq(
@@ -99,8 +99,8 @@ lazy val welcomeSettings = Seq(
     UsefulTask("formatAll", "Format all Scala code.").alias("f"),
     UsefulTask("test", "Run geolocation unit tests with coverage.").alias("t"),
     UsefulTask("integrationTests/test", "Run geolocation integration tests.").alias("it"),
-    UsefulTask("http/run", "Run geolocation.").alias("http"),
-    UsefulTask("http/Docker/publishLocal", "Publish local docker image.").alias("p"),
+    UsefulTask("geolocationHttp/run", "Run geolocation.").alias("http"),
+    UsefulTask("geolocationHttp/Docker/publishLocal", "Publish local docker image.").alias("p"),
     UsefulTask("githubWorkflowGenerate", "Generate GitHub CI/CD.").alias("cicd"),
   ),
 )

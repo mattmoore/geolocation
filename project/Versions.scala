@@ -1,9 +1,10 @@
 object Versions {
-  val catsCore                = "2.12.0"
-  val catsEffect              = "3.5.5"
+  val catsCore                = "2.13.0"
+  val catsEffect              = "3.5.7"
   val caseInsensitive         = "1.4.2"
   val circe                   = "0.14.10"
   val ciris                   = "3.6.0"
+  val doobie                  = "1.0.0-RC6"
   val flyway                  = "10.19.0"
   val fs2                     = "3.11.0"
   val gatling                 = "3.13.1"

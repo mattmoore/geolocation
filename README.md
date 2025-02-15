@@ -8,6 +8,12 @@ Geolocation service for operations with addresses and GPS coordinates. There is 
 
 ## Start geolocation
 
+First, you'll need to install the Docker driver for Grafana Loki:
+
+```shell
+docker plugin install grafana/loki-docker-driver:3.3.2-arm64 --alias loki --grant-all-permissions
+```
+
 ```shell
 docker compose -f docker/geolocation/docker-compose.yml up -d
 ```

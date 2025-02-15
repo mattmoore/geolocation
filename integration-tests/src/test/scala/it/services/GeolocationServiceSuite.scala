@@ -3,7 +3,7 @@ package geolocation.it.services
 import cats.effect.*
 import cats.effect.std.AtomicCell
 import com.dimafeng.testcontainers.PostgreSQLContainer
-import geolocation.Migrations
+import geolocation.MigrationRunner
 import geolocation.MockLogger
 import geolocation.MockLogger.*
 import geolocation.domain.*
@@ -37,10 +37,10 @@ object GeolocationServiceSuite extends IOSuite {
           password = postgresContainer.password,
           database = postgresContainer.databaseName,
           maxConnections = 10,
-          migrationsLocation = "filesystem:../core/src/main/resources/db",
+          migrationsLocation = "filesystem:../geolocation/src/main/resources/db",
         ),
       )
-      _ <- Migrations.migrate(config.databaseConfig)
+      migrationResult <- MigrationRunner(config.databaseConfig)
     } yield TestResource(
       config,
       postgresContainer,

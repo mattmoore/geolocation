@@ -2,7 +2,7 @@ services:
   #################
   ## Application ##
   #################
-  geolocation-postgres:
+  postgres:
     image: 'postgis/postgis:latest'
     ports:
       - '5432:5432'
@@ -20,7 +20,7 @@ services:
     ports:
       - '8080:8080'
     environment:
-      DB_HOST: geolocation-postgres
+      DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: scala
       DB_PASSWORD: scala
@@ -34,7 +34,7 @@ services:
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
     depends_on:
-      geolocation-postgres:
+      postgres:
         condition: service_healthy
         restart: true
     logging:
@@ -149,7 +149,7 @@ services:
             incrementalQueryOverlapWindow: 10m
         - name: Geolocation Postgres
           type: postgres
-          url: geolocation-postgres:5432
+          url: postgres:5432
           user: scala
           secureJsonData:
             password: 'scala'
