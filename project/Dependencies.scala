@@ -11,10 +11,14 @@ object Dependencies {
       Ip4s.ip4s,
       PostgreSql.postgresql,
       Tpolecat.doobie,
-      Tpolecat.skunk,
       Typelevel.catsCore,
       Typelevel.catsEffect,
       Typelevel.log4catsCore,
+      Typelevel.otel4sCoreCommon,
+      Typelevel.otel4sCoreMetrics,
+      Typelevel.otel4sCoreTrace,
+      Typelevel.otel4sOteljava,
+      Typelevel.otel4sOteljavaCommon,
       Weaver.weaverCats,
     )
 
@@ -49,7 +53,6 @@ object Dependencies {
       Tapir.jsoniterScalaCore,
       Tapir.jsoniterScalaMacro,
       Tpolecat.doobie,
-      Tpolecat.skunk,
       Typelevel.catsCore,
       Typelevel.catsEffect,
       Typelevel.catsEffectKernel,
@@ -183,7 +186,6 @@ object Dependencies {
     lazy val doobie         = "org.tpolecat" %% "doobie-core"     % Versions.doobie
     lazy val doobiePostgres = "org.tpolecat" %% "doobie-postgres" % Versions.doobie
     lazy val doobieHikari   = "org.tpolecat" %% "doobie-hikari"   % Versions.doobie
-    lazy val skunk          = "org.tpolecat" %% "skunk-core"      % Versions.skunk
   }
 
   object TestContainers {

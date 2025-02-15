@@ -4,6 +4,7 @@ import cats.*
 import cats.effect.*
 import cats.effect.std.Console
 import fs2.io.net.Network
+import doobie.*
 import geolocation.*
 import geolocation.domain.*
 import geolocation.repositories.*
@@ -18,7 +19,6 @@ import org.typelevel.otel4s.metrics.Meter
 import org.typelevel.otel4s.oteljava.OtelJava
 import org.typelevel.otel4s.oteljava.context.Context
 import org.typelevel.otel4s.trace.Tracer
-import skunk.Session
 import sttp.tapir.server.metrics.prometheus.PrometheusMetrics
 import sttp.tapir.server.http4s.Http4sServerOptions
 import sttp.tapir.AttributeKey
@@ -37,26 +37,22 @@ object Resources {
       )
       prometheusMetrics <- Resource.eval(Async[F].delay(PrometheusMetrics.default[F]("geolocation")))
       migrationRunner   <- MigrationRunner(config.databaseConfig)
-      session <- Session.pooled(
-        host = config.databaseConfig.host,
-        port = config.databaseConfig.port,
+      xa: Transactor[F] = Transactor.fromDriverManager[F](
+        driver = "org.postgresql.Driver",
+        url = s"jdbc:postgresql://${config.databaseConfig.host}:${config.databaseConfig.port}/geolocation",
         user = config.databaseConfig.username,
-        password = Some(config.databaseConfig.password),
-        database = config.databaseConfig.database,
-        max = config.databaseConfig.maxConnections,
+        password = config.databaseConfig.password,
+        logHandler = None,
       )
-      addressRepo: AddressRepository[F]         = AddressRepository(config, session)
+      addressRepo: AddressRepository[F]         = AddressRepository(config, xa)
       helloService: HelloService[F]             = HelloService.apply
       geolocationService: GeolocationService[F] = GeolocationService(addressRepo)
       endpoints                                 = HelloEndpoints(helloService) ++ GeolocationEndpoints(geolocationService)
       metricsInterceptor = endpoints
         .foldLeft(prometheusMetrics) { (prometheusMetrics, serverEndpoint) =>
           serverEndpoint.attribute(AttributeKey[CustomMetricConfig[F]]) match
-            case None => prometheusMetrics
-            case Some(customMetricConfig) => {
-//              prometheusMetrics.registry.register(customMetricConfig.counter)
-              prometheusMetrics.addCustom(customMetricConfig.tapirMetric)
-            }
+            case None                     => prometheusMetrics
+            case Some(customMetricConfig) => prometheusMetrics.addCustom(customMetricConfig.tapirMetric)
         }
         .metricsInterceptor()
       serverOptions = Http4sServerOptions

@@ -22,7 +22,6 @@ object Versions {
   val postgres                = "42.7.4"
   val prometheus              = "1.3.2"
   val prometheusSimpleClient  = "0.16.0"
-  val skunk                   = "1.0.0-M7"
   val slf4j                   = "2.0.16"
   val tapir                   = "1.11.9"
   val tapirModelCore          = "1.7.11"

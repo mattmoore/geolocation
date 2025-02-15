@@ -24,19 +24,14 @@ object GeolocationService {
       for {
         _ <- logger.info(
           Map("function_name" -> "getCoords", "function_args" -> s"$query"),
-        )(
-          s"Invoked getCoords($query)",
-        )
-        result <- tracer.span("getCoords").surround(repo.getByAddress(query)).flatMap {
-          case Some(address) =>
-            address.coords.asRight.pure
+        )(s"Invoked getCoords($query)")
+        result <- tracer.span("getCoords").surround(repo.getByAddress(query)) >>= {
+          case Some(address) => address.coords.asRight.pure
           case None =>
             SelfAwareStructuredLogger[F].error(
               Map("function_name" -> "getCoords", "function_args" -> s"$query"),
-            )(
-              s"Invoked getCoords($query)",
-            ) *>
-              "No address found.".asLeft.pure
+            )(s"Invoked getCoords($query)")
+              >> "No address found.".asLeft.pure
         }
       } yield result
 
@@ -49,7 +44,7 @@ object GeolocationService {
         )
         result <- tracer
           .span("create")
-          .surround(repo.insert(address))
+          .surround(repo.insert(address).void)
           .handleErrorWith { error =>
             logger.error(
               Map("function_name" -> "create", "function_args" -> s"$address"),
