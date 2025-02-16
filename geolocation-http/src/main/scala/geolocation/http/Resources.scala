@@ -4,9 +4,6 @@ import cats.*
 import cats.effect.*
 import cats.effect.std.Console
 import fs2.io.net.Network
-import doobie.*
-import doobie.hikari.*
-import com.zaxxer.hikari.HikariConfig
 import geolocation.*
 import geolocation.domain.*
 import geolocation.repositories.*
@@ -34,24 +31,13 @@ object Resources {
       otel            <- OtelJava.autoConfigured[F]()
       given Meter[F]  <- Resource.eval(otel.meterProvider.get(serviceName))
       given Tracer[F] <- Resource.eval(otel.tracerProvider.get(serviceName))
-      given SelfAwareStructuredLogger[F] = Slf4jLogger.getLogger[F](
-        name = LoggerName("geolocation"),
-      )
+      given SelfAwareStructuredLogger[F] = Slf4jLogger.getLogger[F](name = LoggerName("geolocation"))
       prometheusMetrics <- Resource.eval(Async[F].delay(PrometheusMetrics.default[F]("geolocation")))
-      migrationRunner   <- MigrationRunner(config.databaseConfig)
-      xa: HikariTransactor[F] <- for {
-        c <- Resource.pure {
-          val hc = new HikariConfig
-          hc.setDriverClassName("org.postgresql.Driver")
-          hc.setJdbcUrl(s"jdbc:postgresql://${config.databaseConfig.host}:${config.databaseConfig.port}/geolocation")
-          hc.setUsername(config.databaseConfig.username)
-          hc.setPassword(config.databaseConfig.password)
-          hc
-        }
-        xa <- HikariTransactor.fromHikariConfig[F](c)
-      } yield xa
+      migrationRunner   <- MigrationRunner()
+      _                 <- Resource.eval(migrationRunner.migrate(config.databaseConfig))
+      xa                <- TransactorR(config)
       addressRepo: AddressRepository[F]         = AddressRepository(config, xa)
-      helloService: HelloService[F]             = HelloService.apply
+      helloService: HelloService[F]             = HelloService()
       geolocationService: GeolocationService[F] = GeolocationService(addressRepo)
       endpoints                                 = HelloEndpoints(helloService) ++ GeolocationEndpoints(geolocationService)
       metricsInterceptor = endpoints
@@ -63,18 +49,7 @@ object Resources {
         .metricsInterceptor()
       serverOptions = Http4sServerOptions
         .customiseInterceptors[F]
-        .metricsInterceptor(
-          endpoints
-            .foldLeft(prometheusMetrics) { (prometheusMetrics, serverEndpoint) =>
-              serverEndpoint.attribute(AttributeKey[CustomMetricConfig[F]]) match
-                case None => prometheusMetrics
-                case Some(customMetricConfig) => {
-                  prometheusMetrics.registry.register(customMetricConfig.counter)
-                  prometheusMetrics.addCustom(customMetricConfig.tapirMetric)
-                }
-            }
-            .metricsInterceptor(),
-        )
+        .metricsInterceptor(metricsInterceptor)
         .options
       serverInterpreter = Http4sServerInterpreter[F](serverOptions).toRoutes(
         prometheusMetrics.metricsEndpoint +: endpoints,

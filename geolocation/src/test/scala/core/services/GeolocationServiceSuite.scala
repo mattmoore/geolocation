@@ -37,8 +37,8 @@ object GeolocationServiceSuite extends SimpleIOSuite {
             addresses.find(_.street == query.street)
           }
 
-        override def insert(address: Address): F[Unit] =
-          ().pure
+        override def insert(address: Address): F[Int] =
+          1.pure
       }
       geolocationService = GeolocationService[F](addressRepo)
 
@@ -78,8 +78,8 @@ object GeolocationServiceSuite extends SimpleIOSuite {
             addresses.find(_.street == query.street)
           }
 
-        override def insert(address: Address): F[Unit] =
-          addressState.update(address +: _)
+        override def insert(address: Address): F[Int] =
+          addressState.update(address +: _) >> 1.pure
       }
       geolocationService = GeolocationService[F](addressRepo)
 

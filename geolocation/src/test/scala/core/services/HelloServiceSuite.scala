@@ -16,7 +16,7 @@ object HelloServiceSuite extends SimpleIOSuite {
     for {
       logMessages <- AtomicCell[F].of(List.empty[LogMessage])
       given SelfAwareStructuredLogger[F] = MockLogger[F](logMessages)
-      helloService: HelloService[F]      = HelloService.apply
+      helloService: HelloService[F]      = HelloService()
 
       logMessagesBefore <- logMessages.get
       result            <- helloService.hello("Matt")

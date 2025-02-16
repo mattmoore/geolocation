@@ -11,7 +11,7 @@ import org.typelevel.otel4s.trace.StatusCode
 import org.typelevel.otel4s.trace.Tracer
 
 object Tracing {
-  extension [F[_]: Async: Tracer](service: HttpApp[F])
+  extension [F[_]: {Async, Tracer}](service: HttpApp[F])
     def traced: HttpApp[F] = {
       Kleisli { (req: Request[F]) =>
         Tracer[F]

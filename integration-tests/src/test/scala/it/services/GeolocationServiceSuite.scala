@@ -3,8 +3,7 @@ package geolocation.it.services
 import cats.effect.*
 import cats.effect.std.AtomicCell
 import com.dimafeng.testcontainers.PostgreSQLContainer
-import geolocation.MigrationRunner
-import geolocation.MockLogger
+import geolocation.{MigrationRunner, MockLogger, TransactorR}
 import geolocation.MockLogger.*
 import geolocation.domain.*
 import geolocation.it.containers.PostgresContainer
@@ -13,7 +12,6 @@ import geolocation.services.*
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.extras.LogLevel
 import org.typelevel.otel4s.trace.Tracer.Implicits.noop
-import skunk.Session
 import weaver.*
 
 object GeolocationServiceSuite extends IOSuite {
@@ -21,14 +19,14 @@ object GeolocationServiceSuite extends IOSuite {
   private val F = Async[F]
 
   final case class TestResource(
-      config: Config,
+      config: AppConfig,
       postgresContainer: PostgreSQLContainer,
   )
   override final type Res = TestResource
   override final val sharedResource: Resource[F, Res] =
     for {
       postgresContainer <- Resource.fromAutoCloseable(F.delay(PostgresContainer().start()))
-      config = Config(
+      config = AppConfig(
         port = 5432,
         databaseConfig = DatabaseConfig(
           host = postgresContainer.host,
@@ -40,30 +38,20 @@ object GeolocationServiceSuite extends IOSuite {
           migrationsLocation = "filesystem:../geolocation/src/main/resources/db",
         ),
       )
-      migrationResult <- MigrationRunner(config.databaseConfig)
+      migrationRunner <- MigrationRunner()
+      _               <- Resource.eval(migrationRunner.migrate(config.databaseConfig))
     } yield TestResource(
       config,
       postgresContainer,
     )
 
-  private def pooledSessionR(config: Config): Resource[F, Resource[F, Session[F]]] =
-    Session
-      .pooled(
-        host = config.databaseConfig.host,
-        port = config.databaseConfig.port,
-        user = config.databaseConfig.username,
-        password = Some(config.databaseConfig.password),
-        database = config.databaseConfig.database,
-        max = 1,
-      )
-
   test("getCoords returns GPS coordinates for a given address") { r =>
-    pooledSessionR(r.config).use { session =>
+    TransactorR(r.config).use { xa =>
       for {
         logMessages <- AtomicCell[F].of(List.empty[LogMessage])
-        given Config                       = r.config
+        given AppConfig                    = r.config
         given SelfAwareStructuredLogger[F] = MockLogger[F](logMessages)
-        addressRepo: AddressRepository[F]  = AddressRepository(r.config, session)
+        addressRepo: AddressRepository[F]  = AddressRepository(r.config, xa)
         geolocationService                 = GeolocationService[F](addressRepo)
         query = AddressQuery(
           street = "20 W 34th St.",
@@ -91,12 +79,12 @@ object GeolocationServiceSuite extends IOSuite {
   }
 
   test("create stores a new address") { r =>
-    pooledSessionR(r.config).use { session =>
+    TransactorR(r.config).use { xa =>
       for {
         logMessages <- AtomicCell[F].of(List.empty[LogMessage])
-        given Config                       = r.config
+        given AppConfig                    = r.config
         given SelfAwareStructuredLogger[F] = MockLogger[F](logMessages)
-        addressRepo: AddressRepository[F]  = AddressRepository(r.config, session)
+        addressRepo: AddressRepository[F]  = AddressRepository(r.config, xa)
         geolocationService                 = GeolocationService[F](addressRepo)
         newAddress = Address(
           id = 3,

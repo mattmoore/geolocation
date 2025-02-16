@@ -10,7 +10,7 @@ trait HelloService[F[_]] {
 }
 
 object HelloService {
-  def apply[F[_]: {Async, SelfAwareStructuredLogger, Tracer}]: HelloService[F] = new HelloService[F] {
+  def apply[F[_]: {Async, SelfAwareStructuredLogger, Tracer}](): HelloService[F] = new HelloService[F] {
     def hello(name: String): F[String] =
       for {
         _      <- SelfAwareStructuredLogger[F].info(s"Invoked hello($name)")
