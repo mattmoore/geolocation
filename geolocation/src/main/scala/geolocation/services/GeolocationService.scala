@@ -10,48 +10,67 @@ import org.typelevel.otel4s.trace.Tracer
 
 trait GeolocationService[F[_]] {
   def getCoords(query: AddressQuery): F[Either[String, GpsCoords]]
-  def create(address: Address): F[Unit]
+  def create(address: Address): F[Int]
 }
 
 object GeolocationService {
   def apply[F[_]: {Async, SelfAwareStructuredLogger, Tracer}](
       repo: AddressRepository[F],
   ): GeolocationService[F] = new GeolocationService[F] {
-    val logger = summon[SelfAwareStructuredLogger[F]]
-    val tracer = summon[Tracer[F]]
+    private val logger = summon[SelfAwareStructuredLogger[F]]
+    private val tracer = summon[Tracer[F]]
 
     override def getCoords(query: AddressQuery): F[Either[String, GpsCoords]] =
-      for {
+      (for {
         _ <- logger.info(
-          Map("function_name" -> "getCoords", "function_args" -> s"$query"),
+          Map(
+            "function_name" -> "getCoords",
+            "function_args" -> s"$query",
+          ),
         )(s"Invoked getCoords($query)")
-        result <- tracer.span("getCoords").surround(repo.getByAddress(query)) >>= {
+        maybeAddress <- tracer.span("getCoords").surround(repo.getByAddress(query))
+        result <- maybeAddress match {
           case Some(address) => address.coords.asRight.pure
           case None =>
             SelfAwareStructuredLogger[F].error(
-              Map("function_name" -> "getCoords", "function_args" -> s"$query"),
+              Map(
+                "function_name" -> "getCoords",
+                "function_args" -> s"$query",
+              ),
             )(s"Invoked getCoords($query)")
               >> "No address found.".asLeft.pure
         }
-      } yield result
-
-    override def create(address: Address): F[Unit] =
-      for {
         _ <- logger.info(
-          Map("function_name" -> "create", "function_args" -> s"$address"),
-        )(
-          s"Invoked create($address)",
-        )
-        result <- tracer
-          .span("create")
-          .surround(repo.insert(address).void)
-          .handleErrorWith { error =>
-            logger.error(
-              Map("function_name" -> "create", "function_args" -> s"$address"),
-            )(
-              error.getMessage,
-            )
-          }
-      } yield result
+          Map(
+            "function_name" -> "getCoords",
+            "function_args" -> s"$query",
+          ),
+        )(s"Completed getCoords($query)")
+      } yield result)
+
+    override def create(address: Address): F[Int] =
+      (for {
+        _ <- logger.info(
+          Map(
+            "function_name" -> "create",
+            "function_args" -> s"$address",
+          ),
+        )(s"Invoked create($address)")
+        result <- tracer.span("create").surround(repo.insert(address))
+        _ <- logger.info(
+          Map(
+            "function_name" -> "create",
+            "function_args" -> s"$address",
+          ),
+        )(s"Completed create($address)")
+      } yield result).handleErrorWith { error =>
+        logger.error(
+          Map(
+            "function_name" -> "create",
+            "function_args" -> s"$address",
+          ),
+        )(error.getMessage)
+          >> 0.pure
+      }
   }
 }
