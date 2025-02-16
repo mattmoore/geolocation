@@ -24,6 +24,17 @@ object GeolocationEndpoints {
 
   def apply[F[_]: Async](geolocationService: GeolocationService[F]): List[ServerEndpoint[Any, F]] = List(
     endpoint.post
+      .name("getCoords")
+      .metric(GeolocationByLocationAndStatusTotal[F])
+      .in("api" / "coords")
+      .in(jsonBody[CoordsRequest])
+      .out(jsonBody[GpsCoords])
+      .serverLogicOption[F] { request =>
+        geolocationService
+          .getCoords(request.toDomain)
+          .map(_.toOption)
+      },
+    endpoint.post
       .name("newCoords")
       .metric(NewAddressMetric[F])
       .in("api" / "coords" / "new")
@@ -38,17 +49,6 @@ object GeolocationEndpoints {
             case Left(e)  => e.getMessage.asLeft
             case Right(_) => request.asRight
           }
-      },
-    endpoint.post
-      .name("getCoords")
-      .metric(GeolocationByLocationAndStatusTotal[F])
-      .in("api" / "coords")
-      .in(jsonBody[CoordsRequest])
-      .out(jsonBody[GpsCoords])
-      .serverLogicOption[F] { request =>
-        geolocationService
-          .getCoords(request.toDomain)
-          .map(_.toOption)
       },
   )
 }

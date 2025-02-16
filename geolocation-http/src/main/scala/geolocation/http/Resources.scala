@@ -43,8 +43,11 @@ object Resources {
       metricsInterceptor = endpoints
         .foldLeft(prometheusMetrics) { (prometheusMetrics, serverEndpoint) =>
           serverEndpoint.attribute(AttributeKey[CustomMetricConfig[F]]) match
-            case None                     => prometheusMetrics
-            case Some(customMetricConfig) => prometheusMetrics.addCustom(customMetricConfig.tapirMetric)
+            case None => prometheusMetrics
+            case Some(customMetricConfig) => {
+              prometheusMetrics.registry.register(customMetricConfig.counter)
+              prometheusMetrics.addCustom(customMetricConfig.tapirMetric)
+            }
         }
         .metricsInterceptor()
       serverOptions = Http4sServerOptions

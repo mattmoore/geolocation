@@ -41,10 +41,6 @@ object GeolocationByLocationAndStatusTotal {
               .header("X-Auth-Token-Data-User-Individual")
               .getOrElse("")
           val userId = decode[UserIndividual](userIndividualHeaderValue).map(_.userId.toString).getOrElse("")
-          decode[UserIndividual](userIndividualHeaderValue) match {
-            case Right(value) => println(value)
-            case Left(value)  => println(value)
-          }
           counter
             .labelValues(
               path,
