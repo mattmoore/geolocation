@@ -30,49 +30,49 @@ object MockLogger {
         error(Throwable(msg))(msg)
 
       override def warn(t: Throwable)(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Warn, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Warn, msg))
 
       override def warn(ctx: Map[String, String])(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Warn, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Warn, msg))
 
       override def warn(ctx: Map[String, String], t: Throwable)(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Warn, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Warn, msg))
 
       override def warn(msg: => String): F[Unit] =
         warn(Throwable(msg))(msg)
 
       override def info(t: Throwable)(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Info, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Info, msg))
 
       override def info(ctx: Map[String, String])(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Info, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Info, msg))
 
       override def info(ctx: Map[String, String], t: Throwable)(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Info, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Info, msg))
 
       override def info(msg: => String): F[Unit] =
         info(Throwable(msg))(msg)
 
       override def debug(t: Throwable)(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Debug, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Debug, msg))
 
       override def debug(ctx: Map[String, String])(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Debug, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Debug, msg))
 
       override def debug(ctx: Map[String, String], t: Throwable)(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Debug, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Debug, msg))
 
       override def debug(msg: => String): F[Unit] =
         debug(Throwable(msg))(msg)
 
       override def trace(t: Throwable)(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Trace, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Trace, msg))
 
       override def trace(ctx: Map[String, String])(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Trace, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Trace, msg))
 
       override def trace(ctx: Map[String, String], t: Throwable)(msg: => String): F[Unit] =
-        state.update(messages => LogMessage(LogLevel.Trace, msg) +: messages)
+        state.update(messages => messages :+ LogMessage(LogLevel.Trace, msg))
 
       override def trace(msg: => String): F[Unit] =
         trace(Throwable(msg))(msg)

@@ -65,12 +65,16 @@ object GeolocationServiceSuite extends IOSuite {
       } yield {
         expect.all(
           result == Right(GpsCoords(40.689247, -74.044502)),
-          logMessagesBefore.size == 0,
-          logMessagesAfter.size == 1,
+          logMessagesBefore.isEmpty,
+          logMessagesAfter.size == 2,
           logMessagesAfter == List(
             LogMessage(
               LogLevel.Info,
               "Invoked getCoords(AddressQuery(20 W 34th St.,New York,NY))",
+            ),
+            LogMessage(
+              LogLevel.Info,
+              "Completed getCoords(AddressQuery(20 W 34th St.,New York,NY))",
             ),
           ),
         )
@@ -95,17 +99,21 @@ object GeolocationServiceSuite extends IOSuite {
         )
 
         logMessagesBefore <- logMessages.get
-        result            <- geolocationService.create(newAddress).attempt
+        result            <- geolocationService.create(newAddress)
         logMessagesAfter  <- logMessages.get
       } yield {
         expect.all(
-          result.isRight,
-          logMessagesBefore.size == 0,
-          logMessagesAfter.size == 1,
+          result == 1,
+          logMessagesBefore.isEmpty,
+          logMessagesAfter.size == 2,
           logMessagesAfter == List(
             LogMessage(
               LogLevel.Info,
               "Invoked create(Address(3,20 W 34th St.,New York,NY,GpsCoords(40.689247,-74.044502)))",
+            ),
+            LogMessage(
+              LogLevel.Info,
+              "Completed create(Address(3,20 W 34th St.,New York,NY,GpsCoords(40.689247,-74.044502)))",
             ),
           ),
         )

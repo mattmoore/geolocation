@@ -38,7 +38,7 @@ object GeolocationServiceSuite extends SimpleIOSuite {
           }
 
         override def insert(address: Address): F[Int] =
-          1.pure
+          Async[F].raiseError(new Exception("Should not be called"))
       }
       geolocationService = GeolocationService[F](addressRepo)
 
@@ -54,12 +54,16 @@ object GeolocationServiceSuite extends SimpleIOSuite {
     } yield {
       expect.all(
         result == Right(GpsCoords(40.689247, -74.044502)),
-        logMessagesBefore.size == 0,
-        logMessagesAfter.size == 1,
+        logMessagesBefore.isEmpty,
+        logMessagesAfter.size == 2,
         logMessagesAfter == List(
           LogMessage(
             LogLevel.Info,
             "Invoked getCoords(AddressQuery(20 W 34th St.,New York,NY))",
+          ),
+          LogMessage(
+            LogLevel.Info,
+            "Completed getCoords(AddressQuery(20 W 34th St.,New York,NY))",
           ),
         ),
       )
@@ -79,7 +83,7 @@ object GeolocationServiceSuite extends SimpleIOSuite {
           }
 
         override def insert(address: Address): F[Int] =
-          addressState.update(address +: _) >> 1.pure
+          addressState.update(_ :+ address) >> 1.pure
       }
       geolocationService = GeolocationService[F](addressRepo)
 
@@ -96,13 +100,17 @@ object GeolocationServiceSuite extends SimpleIOSuite {
       logMessagesAfter  <- logMessages.get
     } yield {
       expect.all(
-        result == (),
-        logMessagesBefore.size == 0,
-        logMessagesAfter.size == 1,
+        result == 1,
+        logMessagesBefore.isEmpty,
+        logMessagesAfter.size == 2,
         logMessagesAfter == List(
           LogMessage(
             LogLevel.Info,
             "Invoked create(Address(1,20 W 34th St.,New York,NY,GpsCoords(40.689247,-74.044502)))",
+          ),
+          LogMessage(
+            LogLevel.Info,
+            "Completed create(Address(1,20 W 34th St.,New York,NY,GpsCoords(40.689247,-74.044502)))",
           ),
         ),
       )
