@@ -40,6 +40,7 @@ object Dependencies {
       Logback.logstashLogbackEncoder % Runtime,
       OpenTelemetry.opentelemetrySdkExtensionAutoconfigure,
       OpenTelemetry.opentelemetryExporterOtlp,
+      OpenTelemetry.opentelemetryExporterLogging,
       Prometheus.prometheusMetricsCore,
       Prometheus.prometheusMetricsModel,
       Prometheus.prometheusSimpleClient,
@@ -50,6 +51,9 @@ object Dependencies {
       Tapir.tapirServer,
       Tapir.tapirHttp4sServer,
       Tapir.tapirJsoniterScala,
+      Tapir.tapirOpenTelemetryTracing,
+      Tapir.tapirOpenTelemetryMetrics,
+      Tapir.tapirOtel4sTracing,
       Tapir.tapirPrometheusMetrics,
       Tapir.jsoniterScalaCore,
       Tapir.jsoniterScalaMacro,
@@ -67,6 +71,7 @@ object Dependencies {
       Typelevel.otel4sCoreTrace,
       Typelevel.otel4sOteljava,
       Typelevel.otel4sOteljavaCommon,
+      Otel4sDoobie.otel4sDoobie,
     )
 
     lazy val integrationTests = Seq(
@@ -104,6 +109,10 @@ object Dependencies {
     lazy val otel4sCoreTrace      = "org.typelevel" %% "otel4s-core-trace"      % Versions.otel4s
     lazy val otel4sOteljava       = "org.typelevel" %% "otel4s-oteljava"        % Versions.otel4s
     lazy val otel4sOteljavaCommon = "org.typelevel" %% "otel4s-oteljava-common" % Versions.otel4s
+  }
+
+  object Otel4sDoobie {
+    lazy val otel4sDoobie = "io.github.arturaz" %% "otel4s-doobie" % Versions.otel4sDoobie
   }
 
   object Circe {
@@ -170,18 +179,21 @@ object Dependencies {
   }
 
   object Tapir {
-    lazy val tapirModelCore         = "com.softwaremill.sttp.model"           %% "core"                     % Versions.tapirModelCore
-    lazy val tapirSharedCore        = "com.softwaremill.sttp.shared"          %% "core"                     % Versions.tapirShared
-    lazy val tapirSharedFs2         = "com.softwaremill.sttp.shared"          %% "fs2"                      % Versions.tapirShared
-    lazy val tapirCore              = "com.softwaremill.sttp.tapir"           %% "tapir-core"               % Versions.tapir
-    lazy val tapirServer            = "com.softwaremill.sttp.tapir"           %% "tapir-server"             % Versions.tapir
-    lazy val tapirHttp4sServer      = "com.softwaremill.sttp.tapir"           %% "tapir-http4s-server"      % Versions.tapir
-    lazy val tapirSwaggerUiBundle   = "com.softwaremill.sttp.tapir"           %% "tapir-swagger-ui-bundle"  % Versions.tapir
-    lazy val tapirJsoniterScala     = "com.softwaremill.sttp.tapir"           %% "tapir-jsoniter-scala"     % Versions.tapir
-    lazy val tapirJsonCirce         = "com.softwaremill.sttp.tapir"           %% "tapir-json-circe"         % Versions.tapir
-    lazy val tapirPrometheusMetrics = "com.softwaremill.sttp.tapir"           %% "tapir-prometheus-metrics" % Versions.tapir
-    lazy val jsoniterScalaCore      = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"      % Versions.jsoniterScala
-    lazy val jsoniterScalaMacro     = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros"    % Versions.jsoniterScala
+    lazy val tapirModelCore            = "com.softwaremill.sttp.model"           %% "core"                        % Versions.tapirModelCore
+    lazy val tapirSharedCore           = "com.softwaremill.sttp.shared"          %% "core"                        % Versions.tapirShared
+    lazy val tapirSharedFs2            = "com.softwaremill.sttp.shared"          %% "fs2"                         % Versions.tapirShared
+    lazy val tapirCore                 = "com.softwaremill.sttp.tapir"           %% "tapir-core"                  % Versions.tapir
+    lazy val tapirServer               = "com.softwaremill.sttp.tapir"           %% "tapir-server"                % Versions.tapir
+    lazy val tapirHttp4sServer         = "com.softwaremill.sttp.tapir"           %% "tapir-http4s-server"         % Versions.tapir
+    lazy val tapirSwaggerUiBundle      = "com.softwaremill.sttp.tapir"           %% "tapir-swagger-ui-bundle"     % Versions.tapir
+    lazy val tapirJsoniterScala        = "com.softwaremill.sttp.tapir"           %% "tapir-jsoniter-scala"        % Versions.tapir
+    lazy val tapirJsonCirce            = "com.softwaremill.sttp.tapir"           %% "tapir-json-circe"            % Versions.tapir
+    lazy val tapirOpenTelemetryTracing = "com.softwaremill.sttp.tapir"           %% "tapir-opentelemetry-tracing" % Versions.tapir
+    lazy val tapirOpenTelemetryMetrics = "com.softwaremill.sttp.tapir"           %% "tapir-opentelemetry-metrics" % Versions.tapir
+    lazy val tapirOtel4sTracing        = "com.softwaremill.sttp.tapir"           %% "tapir-otel4s-tracing"        % Versions.tapir
+    lazy val tapirPrometheusMetrics    = "com.softwaremill.sttp.tapir"           %% "tapir-prometheus-metrics"    % Versions.tapir
+    lazy val jsoniterScalaCore         = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"         % Versions.jsoniterScala
+    lazy val jsoniterScalaMacro        = "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros"       % Versions.jsoniterScala
   }
 
   object Doobie {

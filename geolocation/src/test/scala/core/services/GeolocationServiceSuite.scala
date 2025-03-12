@@ -9,7 +9,8 @@ import geolocation.domain.*
 import geolocation.repositories.*
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.extras.LogLevel
-import org.typelevel.otel4s.trace.Tracer.Implicits.noop
+import org.typelevel.otel4s.metrics.Meter
+import org.typelevel.otel4s.trace.Tracer
 import weaver.*
 
 object GeolocationServiceSuite extends SimpleIOSuite {
@@ -20,6 +21,8 @@ object GeolocationServiceSuite extends SimpleIOSuite {
     for {
       logMessages <- AtomicCell[F].of(List.empty[LogMessage])
       given SelfAwareStructuredLogger[F] = MockLogger[F](logMessages)
+      given Meter[F]                     = Meter.noop
+      given Tracer[F]                    = Tracer.noop
 
       addresses = List(
         Address(
@@ -74,6 +77,8 @@ object GeolocationServiceSuite extends SimpleIOSuite {
     for {
       logMessages <- AtomicCell[F].of(List.empty[LogMessage])
       given SelfAwareStructuredLogger[F] = MockLogger[F](logMessages)
+      given Meter[F]                     = Meter.noop
+      given Tracer[F]                    = Tracer.noop
 
       addressState <- F.ref(List.empty[Address])
       addressRepo: AddressRepository[F] = new AddressRepository[F] {

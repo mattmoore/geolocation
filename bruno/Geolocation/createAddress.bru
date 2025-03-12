@@ -1,0 +1,24 @@
+meta {
+  name: createAddress
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{geolocation}}/api/coords/new
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": 3,
+    "street": "123 Anywhere St.",
+    "city": "New York",
+    "state": "NY",
+    "coords": {
+      "lat": 10,
+      "lon": 10
+    }
+  }
+}

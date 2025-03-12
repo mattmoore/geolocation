@@ -6,6 +6,7 @@ import cats.effect.std.Console
 import doobie.*
 import doobie.implicits.*
 import geolocation.domain.*
+import org.typelevel.otel4s.trace.Tracer
 
 trait AddressRepository[F[_]] {
   def getByAddress(addressQuery: AddressQuery): F[Option[Address]]
@@ -14,7 +15,7 @@ trait AddressRepository[F[_]] {
 }
 
 object AddressRepository {
-  def apply[F[_]: {Async, Console}](
+  def apply[F[_]: {Async, Console, Tracer}](
       config: AppConfig,
       xa: Transactor[F],
   ): AddressRepository[F] = new AddressRepository[F] {
