@@ -6,7 +6,8 @@ import geolocation.MockLogger
 import geolocation.MockLogger.LogMessage
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.extras.LogLevel
-import org.typelevel.otel4s.trace.Tracer.Implicits.noop
+import org.typelevel.otel4s.metrics.Meter
+import org.typelevel.otel4s.trace.Tracer
 import weaver.*
 
 object HelloServiceSuite extends SimpleIOSuite {
@@ -16,6 +17,8 @@ object HelloServiceSuite extends SimpleIOSuite {
     for {
       logMessages <- AtomicCell[F].of(List.empty[LogMessage])
       given SelfAwareStructuredLogger[F] = MockLogger[F](logMessages)
+      given Meter[F]                     = Meter.noop
+      given Tracer[F]                    = Tracer.noop
       helloService: HelloService[F]      = HelloService()
 
       logMessagesBefore <- logMessages.get

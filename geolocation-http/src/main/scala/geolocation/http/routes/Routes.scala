@@ -1,19 +1,20 @@
 package geolocation.http.routes
 
 import cats.effect.*
+import geolocation.http.metrics.CustomMetricConfig
 import geolocation.services.GeolocationService
 import geolocation.services.HelloService
-import geolocation.http.metrics.CustomMetricConfig
 import org.http4s.HttpRoutes
+import org.typelevel.otel4s.metrics.Meter
 import org.typelevel.otel4s.trace.Tracer
 import sttp.tapir.*
+import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.http4s.Http4sServerInterpreter
 import sttp.tapir.server.http4s.Http4sServerOptions
 import sttp.tapir.server.metrics.prometheus.PrometheusMetrics
-import sttp.tapir.server.ServerEndpoint
 
 object Routes {
-  def apply[F[_]: {Async, Tracer}](
+  def apply[F[_]: {Async, Meter, Tracer}](
       helloService: HelloService[F],
       geolocationService: GeolocationService[F],
       prometheusMetrics: PrometheusMetrics[F],

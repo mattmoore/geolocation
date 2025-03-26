@@ -11,7 +11,8 @@ import geolocation.repositories.AddressRepository
 import geolocation.services.*
 import org.typelevel.log4cats.SelfAwareStructuredLogger
 import org.typelevel.log4cats.extras.LogLevel
-import org.typelevel.otel4s.trace.Tracer.Implicits.noop
+import org.typelevel.otel4s.metrics.Meter
+import org.typelevel.otel4s.trace.Tracer
 import weaver.*
 
 object GeolocationServiceSuite extends IOSuite {
@@ -27,6 +28,7 @@ object GeolocationServiceSuite extends IOSuite {
     for {
       postgresContainer <- Resource.fromAutoCloseable(F.delay(PostgresContainer().start()))
       config = AppConfig(
+        serviceName = "geolocation-service",
         port = 5432,
         databaseConfig = DatabaseConfig(
           host = postgresContainer.host,
@@ -51,6 +53,8 @@ object GeolocationServiceSuite extends IOSuite {
         logMessages <- AtomicCell[F].of(List.empty[LogMessage])
         given AppConfig                    = r.config
         given SelfAwareStructuredLogger[F] = MockLogger[F](logMessages)
+        given Meter[F]                     = Meter.noop
+        given Tracer[F]                    = Tracer.noop
         addressRepo: AddressRepository[F]  = AddressRepository(r.config, xa)
         geolocationService                 = GeolocationService[F](addressRepo)
         query = AddressQuery(
@@ -88,6 +92,8 @@ object GeolocationServiceSuite extends IOSuite {
         logMessages <- AtomicCell[F].of(List.empty[LogMessage])
         given AppConfig                    = r.config
         given SelfAwareStructuredLogger[F] = MockLogger[F](logMessages)
+        given Meter[F]                     = Meter.noop
+        given Tracer[F]                    = Tracer.noop
         addressRepo: AddressRepository[F]  = AddressRepository(r.config, xa)
         geolocationService                 = GeolocationService[F](addressRepo)
         newAddress = Address(

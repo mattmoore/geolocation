@@ -6,15 +6,18 @@ import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
 import com.github.plokhotnyuk.jsoniter_scala.macros.JsonCodecMaker
 import geolocation.domain.Address
 import geolocation.domain.GpsCoords
-import Http4sTapirImplicits.*
-import geolocation.http.metrics.NewAddressMetric
-import geolocation.http.requests.{CoordsRequest, CreateAddressRequest}
-import geolocation.services.GeolocationService
 import geolocation.http.metrics.GeolocationByLocationAndStatusTotal
+import geolocation.http.metrics.NewAddressMetric
+import geolocation.http.requests.CoordsRequest
+import geolocation.http.requests.CreateAddressRequest
+import geolocation.services.GeolocationService
+import org.typelevel.otel4s.trace.Tracer
 import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.jsoniter.*
 import sttp.tapir.server.ServerEndpoint
+
+import Http4sTapirImplicits.*
 
 object GeolocationEndpoints {
   given JsonValueCodec[CoordsRequest]        = JsonCodecMaker.make[CoordsRequest]
@@ -22,7 +25,9 @@ object GeolocationEndpoints {
   given JsonValueCodec[CreateAddressRequest] = JsonCodecMaker.make[CreateAddressRequest]
   given JsonValueCodec[Address]              = JsonCodecMaker.make[Address]
 
-  def apply[F[_]: Async](geolocationService: GeolocationService[F]): List[ServerEndpoint[Any, F]] = List(
+  def apply[F[_]: {Async, Tracer}](
+      geolocationService: GeolocationService[F],
+  ): List[ServerEndpoint[Any, F]] = List(
     endpoint.post
       .name("getCoords")
       .metric(GeolocationByLocationAndStatusTotal[F])

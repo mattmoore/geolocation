@@ -12,6 +12,11 @@ scrape_configs:
     static_configs:
       - targets: ["otel-collector:8889"]
 
-  - job_name: "geolocation" # scrape metrics from the geolocation collector
+  # - job_name: "geolocation" # scrape metrics from the geolocation collector
+  #   static_configs:
+  #     - targets: ["geolocation:8080"]
+
+  - job_name: 'postgres-exporter'
+    scrape_interval: 5s
     static_configs:
-      - targets: ["geolocation:8080"]
+      - targets: ["postgres-exporter:9187"]

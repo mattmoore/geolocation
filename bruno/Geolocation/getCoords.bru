@@ -1,0 +1,19 @@
+meta {
+  name: getCoords
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{geolocation}}/api/coords
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "street": "123 Anywhere St.",
+    "city": "New York",
+    "state": "NY"
+  }
+}

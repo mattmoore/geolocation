@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-exporter
+  namespace: geolocation
+  labels:
+    app: postgres-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-exporter
+  template:
+    metadata:
+      labels:
+        app: postgres-exporter
+    spec:
+      containers:
+      - name: postgres-exporter
+        image: quay.io/prometheuscommunity/postgres-exporter
+        env:
+          - name: DATA_SOURCE_URI
+            value: "postgres:5432/geolocation?sslmode=disable"
+          - name: DATA_SOURCE_USER
+            value: "geolocation"
+          - name: DATA_SOURCE_PASS
+            value: "geolocation"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-exporter
+  namespace: geolocation
+spec:
+  type: NodePort
+  selector:
+    app: postgres-exporter
+  ports:
+  - name: postgres-exporter-port
+    protocol: TCP
+    port: 9187
+    nodePort: 30081

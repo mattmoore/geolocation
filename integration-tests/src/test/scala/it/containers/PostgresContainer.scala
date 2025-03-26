@@ -10,8 +10,8 @@ object PostgresContainer {
         .parse("postgis/postgis:latest")
         .asCompatibleSubstituteFor("postgres"),
       databaseName = "geolocation",
-      username = "scala",
-      password = "scala",
+      username = "geolocation",
+      password = "geolocation",
       // Leaving this here as an example of how you can run postgres init SQL scripts within testcontainers
       // commonJdbcParams = JdbcDatabaseContainer.CommonParams(
       //   initScriptPath = "database/init.sql".some,

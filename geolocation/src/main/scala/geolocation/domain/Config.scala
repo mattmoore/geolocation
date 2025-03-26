@@ -15,6 +15,7 @@ final case class DatabaseConfig(
 )
 
 final case class AppConfig(
+    serviceName: String,
     port: Int,
     databaseConfig: DatabaseConfig,
 )
@@ -23,8 +24,8 @@ val databaseConfig: ConfigValue[Effect, DatabaseConfig] =
   (
     env("DB_HOST").as[String].default("localhost"),
     env("DB_PORT").as[Int].default(5432),
-    env("DB_USERNAME").as[String].default("scala"),
-    env("DB_PASSWORD").as[String].default("scala"),
+    env("DB_USERNAME").as[String].default("geolocation"),
+    env("DB_PASSWORD").as[String].default("geolocation"),
     env("DB_DATABASE").as[String].default("geolocation"),
     env("DB_MAX_CONNECTIONS").as[Int].default(10),
     env("DB_MIGRATIONS_LOCATION").as[String].default("db"),
@@ -32,6 +33,7 @@ val databaseConfig: ConfigValue[Effect, DatabaseConfig] =
 
 val config: ConfigValue[Effect, AppConfig] =
   (
+    env("SERVICE_NAME").as[String].default("geolocation-service"),
     env("PORT").as[Int].default(8080),
     databaseConfig,
   ).parMapN(AppConfig.apply)

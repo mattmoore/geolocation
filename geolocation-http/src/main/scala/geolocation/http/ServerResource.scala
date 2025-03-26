@@ -9,12 +9,9 @@ import org.http4s.*
 import org.http4s.ember.server.*
 import org.http4s.implicits.*
 import org.http4s.server.Server
-import org.typelevel.otel4s.trace.Tracer
-
-import Tracing.traced
 
 object ServerResource {
-  def make[F[_]: {Async, Network, Tracer}](
+  def make[F[_]: {Async, Network}](
       config: AppConfig,
       routes: HttpRoutes[F],
   ): Resource[F, Server] =
@@ -26,6 +23,6 @@ object ServerResource {
           .fromInt(config.port)
           .getOrElse(port"8080"),
       )
-      .withHttpApp(routes.orNotFound.traced)
+      .withHttpApp(routes.orNotFound)
       .build
 }

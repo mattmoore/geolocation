@@ -36,6 +36,8 @@ lazy val geolocation = (project in file("geolocation"))
     coverageMinimumBranchTotal := 10,
   )
 
+resolvers += Resolver.mavenLocal
+
 lazy val geolocationHttp = (project in file("geolocation-http"))
   .enablePlugins(
     JavaAgent,
@@ -58,12 +60,12 @@ lazy val geolocationHttp = (project in file("geolocation-http"))
       case PathList(ps @ _*) if ps.last.contains("okio")       => MergeStrategy.first
       case x                                                   => (ThisBuild / assemblyMergeStrategy).value(x)
     },
-    Docker / packageName := "geolocation-http",
-    Docker / version     := "latest",
+    Docker / packageName := "geolocation",
+    Docker / version     := "0.1.0",
     dockerExposedPorts ++= Seq(8080),
     dockerBaseImage := "openjdk:22",
     javaAgents ++= Seq(
-      "io.opentelemetry.javaagent" % "opentelemetry-javaagent" % "1.24.0",
+      "io.opentelemetry.javaagent" % "opentelemetry-javaagent" % "2.14.0",
     ),
     javaOptions ++= Seq(
       "-Dotel.java.global-autoconfigure.enabled=true",

@@ -2,33 +2,23 @@ services:
   #################
   ## Application ##
   #################
-  postgres:
-    image: 'postgis/postgis:latest'
-    ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_USER: scala
-      POSTGRES_PASSWORD: scala
-      POSTGRES_DB: geolocation
-    networks:
-      - geolocation-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-
   geolocation:
-    image: 'geolocation-http:latest'
+    image: 'geolocation:0.1.0'
     ports:
       - '8080:8080'
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_USERNAME: scala
-      DB_PASSWORD: scala
+      DB_USERNAME: geolocation
+      DB_PASSWORD: geolocation
       DB_DATABASE: geolocation
       ## For logging to stdout instead of to a collector
-      #OTEL_TRACES_EXPORTER: logging
-      #OTEL_METRICS_EXPORTER: logging
-      #OTEL_LOGS_EXPORTER: logging
+      #OTEL_TRACES_EXPORTER: console
+      #OTEL_METRICS_EXPORTER: console
+      #OTEL_LOGS_EXPORTER: console
+      #OTEL_TRACES_EXPORTER: otlp
+      #OTEL_METRICS_EXPORTER: otlp
+      #OTEL_LOGS_EXPORTER: otlp
       OTEL_SERVICE_NAME: geolocation
       OTEL_METRIC_EXPORT_INTERVAL: 15000
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
@@ -37,33 +27,65 @@ services:
       postgres:
         condition: service_healthy
         restart: true
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+    #logging:
+    #  driver: loki
+    #  options:
+    #    loki-url: "http://localhost:3100/loki/api/v1/push"
     networks:
       - geolocation-network
+
+  #################
+  ## Database ##
+  #################
+  postgres:
+    image: postgis/postgis:16-master
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: geolocation
+      POSTGRES_PASSWORD: geolocation
+      POSTGRES_DB: geolocation
+    networks:
+      - geolocation-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    ports:
+      - "9187:9187"
+    environment:
+      DATA_SOURCE_URI: "postgres:5432/geolocation?sslmode=disable"
+      DATA_SOURCE_USER: "geolocation"
+      DATA_SOURCE_PASS: "geolocation"
+    networks:
+      - geolocation-network
+    depends_on:
+      - postgres
 
   ###################
   ## Observability ##
   ###################
-  otel-collector: # receives application metrics and traces via gRPC or HTTP protocol
-    image: otel/opentelemetry-collector-contrib
-    command: [--config=/etc/otel-collector-config.yaml]
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.121.0
+    command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
-      - "./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml"
+      - "./observability/otel-collector-config.yaml:/etc/otel-collector-config.yaml"
     ports:
       - "8888:8888" # Prometheus metrics exposed by the collector
       - "8889:8889" # Prometheus exporter metrics
       - "4317:4317" # OTLP gRPC receiver
       - "4318:4318" # OTLP http receiver
+    depends_on:
+      - jaeger
+      - prometheus
     networks:
       - geolocation-network
 
-  jaeger: # stores traces received from the OpenTelemetry Collector 
-    image: jaegertracing/all-in-one:latest
+  jaeger:
+    image: jaegertracing/all-in-one:1.67.0
     volumes:
-      - "./config/jaeger-ui.json:/etc/jaeger/jaeger-ui.json"
+      - "./observability/jaeger-ui.json:/etc/jaeger/jaeger-ui.json"
     command: --query.ui-config /etc/jaeger/jaeger-ui.json
     environment:
       - COLLECTOR_OTLP_ENABLED=true
@@ -76,33 +98,33 @@ services:
     networks:
       - geolocation-network
 
-  prometheus: # scrapes metrics from the OpenTelemetry Collector
-    image: prom/prometheus:latest
+  prometheus:
+    image: prom/prometheus:v3.2.1
     volumes:
-      - "./config/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     networks:
       - geolocation-network
 
-  promtail:
-    image: grafana/promtail:2.9.10
-    volumes:
-      - /var/log:/var/log
-    command: -config.file=/etc/promtail/config.yml
-    networks:
-      - geolocation-network
+  #promtail:
+  #  image: grafana/promtail:2.9.10
+  #  volumes:
+  #    - /var/log:/var/log
+  #  command: -config.file=/etc/promtail/config.yml
+  #  networks:
+  #    - geolocation-network
 
   loki:
-    image: grafana/loki:2.9.10
+    image: grafana/loki:3.4.2
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - geolocation-network
 
-  grafana: # queries Jaeger and Prometheus to visualize traces and metrics
-    image: grafana/grafana:latest
+  grafana:
+    image: grafana/grafana:11.5.2
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -111,7 +133,7 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     volumes:
-      - ./config/dashboards:/etc/grafana/provisioning/dashboards/
+      - ./observability/dashboards:/etc/grafana/provisioning/dashboards/
     entrypoint:
       - sh
       - -euc
@@ -152,7 +174,7 @@ services:
           url: postgres:5432
           user: scala
           secureJsonData:
-            password: 'scala'
+            password: 'geolocation'
           jsonData:
             database: geolocation
             sslmode: 'disable' # disable/require/verify-ca/verify-full

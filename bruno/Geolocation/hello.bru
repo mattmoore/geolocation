@@ -1,0 +1,15 @@
+meta {
+  name: hello
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{geolocation}}/api/hello?name=Matt
+  body: none
+  auth: none
+}
+
+params:query {
+  name: Matt
+}
