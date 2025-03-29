@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: geolocation
+  labels:
+    app: prometheus
+    component: prometheus-config
+data:
+  prometheus.yml: |-
+    {{- tpl ($.Files.Get "prometheus.yml") . | nindent 4 }}

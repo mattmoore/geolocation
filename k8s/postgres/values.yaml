@@ -1,0 +1,10 @@
+namespace: geolocation
+
+appName: postgres
+image: postgis/postgis:16-master
+port: 5432
+
+postgres:
+  db: geolocation
+  username: geolocation
+  password: geolocation

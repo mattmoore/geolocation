@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jaeger-config
+  namespace: geolocation
+  labels:
+    app: jaeger
+    component: jaeger-config
+data:
+  jaeger.yml: |

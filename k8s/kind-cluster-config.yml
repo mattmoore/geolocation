@@ -1,0 +1,45 @@
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+name: geolocation
+nodes:
+- role: control-plane
+  extraMounts:
+    - hostPath: "/var/data"
+      containerPath: "/var/data"
+  extraPortMappings:
+    # geolocation
+    - containerPort: 30080
+      hostPort: 30080
+      listenAddress: "0.0.0.0"
+      protocol: tcp
+    # postgres
+    - containerPort: 32543
+      hostPort: 32543
+      listenAddress: "0.0.0.0"
+      protocol: tcp
+    # postgres-exporter
+    - containerPort: 30081
+      hostPort: 30081
+      listenAddress: "0.0.0.0"
+      protocol: tcp
+    # grafana
+    - containerPort: 30000
+      hostPort: 30000
+      listenAddress: "0.0.0.0"
+      protocol: tcp
+    # prometheus
+    - containerPort: 30090
+      hostPort: 30090
+      listenAddress: "0.0.0.0"
+      protocol: tcp
+    # jaeger ui
+    - containerPort: 30086
+      hostPort: 30086
+      listenAddress: "0.0.0.0"
+      protocol: tcp
+    # otel metrics
+    - containerPort: 30889
+      hostPort: 30889
+      listenAddress: "0.0.0.0"
+      protocol: tcp
+- role: worker

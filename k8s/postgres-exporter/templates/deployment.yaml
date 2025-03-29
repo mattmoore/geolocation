@@ -25,18 +25,3 @@ spec:
             value: "geolocation"
           - name: DATA_SOURCE_PASS
             value: "geolocation"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres-exporter
-  namespace: geolocation
-spec:
-  type: NodePort
-  selector:
-    app: postgres-exporter
-  ports:
-  - name: postgres-exporter-port
-    protocol: TCP
-    port: 9187
-    nodePort: 30081

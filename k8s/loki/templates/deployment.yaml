@@ -20,18 +20,3 @@ spec:
           image: grafana/loki:3.4.2
           args:
             - "-config.file=/etc/loki/local-config.yaml"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: loki
-  namespace: geolocation
-spec:
-  type: NodePort
-  selector:
-    app: loki
-  ports:
-  - name: loki-port
-    protocol: TCP
-    port: 3100
-    nodePort: 30100

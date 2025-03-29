@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.appName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }}
+    spec:
+      containers:
+      - name: {{ .Values.appName }}
+        image: {{ .Values.image }}
+        env:
+          - name: DB_HOST
+            value: {{ .Values.postgres.host }}
+          - name: DB_PORT
+            value: "{{ .Values.postgres.port }}"
+          - name: DB_DATABASE
+            value: {{ .Values.postgres.database }}
+          - name: DB_USERNAME
+            value: {{ .Values.postgres.username }}
+          - name: DB_PASSWORD
+            value: {{ .Values.postgres.password }}
+          - name: OTEL_SERVICE_NAME
+            value: {{ .Values.appName }}
+          - name: OTEL_METRIC_EXPORT_INTERVAL
+            value: "15000"
+          - name: OTEL_EXPORTER_OTLP_PROTOCOL
+            value: "grpc"
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: "http://otel-collector:4317"
