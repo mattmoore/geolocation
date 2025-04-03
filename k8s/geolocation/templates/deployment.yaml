@@ -18,6 +18,13 @@ spec:
       containers:
       - name: {{ .Values.appName }}
         image: {{ .Values.image }}
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 4096Mi
+          requests:
+            cpu: 200m
+            memory: 2048Mi
         env:
           - name: DB_HOST
             value: {{ .Values.postgres.host }}
