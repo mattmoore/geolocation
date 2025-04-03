@@ -4,6 +4,9 @@
 create-cluster:
 	kind create cluster --config kind-cluster-config.yml
 	kubectl create namespace geolocation
+	kubectl create namespace monitoring
+	helm upgrade --install --set args={--kubelet-insecure-tls} metrics-server metrics-server/metrics-server --namespace kube-system
+	helm install kube-state-metrics kube-state-metrics
 
 .PHONY: delete-cluster
 delete-cluster:
@@ -20,7 +23,6 @@ install:
 	helm install otel-collector otel-collector
 	helm install grafana grafana
 	helm install geolocation geolocation
-	helm install kube-state-metrics kube-state-metrics
 
 .PHONY: uninstall
 uninstall:
@@ -33,4 +35,3 @@ uninstall:
 	helm uninstall otel-collector
 	helm uninstall grafana
 	helm uninstall geolocation
-	helm uninstall kube-state-metrics

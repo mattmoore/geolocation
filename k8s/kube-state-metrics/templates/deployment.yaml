@@ -1,34 +1,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kube-state-metrics
-  namespace: kube-system
+  name: {{ .Values.appName }}
+  namespace: {{ .Values.namespace }}
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/name: {{ .Values.appName }}
     app.kubernetes.io/version: 2.15.0
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: kube-state-metrics
+      app.kubernetes.io/name: {{ .Values.appName }}
   template:
     metadata:
       labels:
         app.kubernetes.io/component: exporter
-        app.kubernetes.io/name: kube-state-metrics
+        app.kubernetes.io/name: {{ .Values.appName }}
         app.kubernetes.io/version: 2.15.0
     spec:
       automountServiceAccountToken: true
       containers:
-      - image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0
+      - image: {{ .Values.image }}
         livenessProbe:
           httpGet:
             path: /livez
             port: http-metrics
           initialDelaySeconds: 5
           timeoutSeconds: 5
-        name: kube-state-metrics
+        name: {{ .Values.appName }}
         ports:
         - containerPort: 8080
           name: http-metrics
@@ -52,4 +52,4 @@ spec:
             type: RuntimeDefault
       nodeSelector:
         kubernetes.io/os: linux
-      serviceAccountName: kube-state-metrics
+      serviceAccountName: {{ .Values.appName }}

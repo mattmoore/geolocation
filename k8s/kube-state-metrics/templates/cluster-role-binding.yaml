@@ -1,17 +1,16 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kube-state-metrics
-  namespace: geolocation
+  name: {{ .Values.appName }}
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/name: {{ .Values.appName }}
     app.kubernetes.io/version: 2.15.0
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: kube-state-metrics
+  name: {{ .Values.appName }}
 subjects:
 - kind: ServiceAccount
-  name: kube-state-metrics
-  namespace: kube-system
+  name: {{ .Values.appName }}
+  namespace: {{ .Values.namespace }}

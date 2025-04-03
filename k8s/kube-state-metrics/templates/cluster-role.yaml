@@ -1,11 +1,10 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kube-state-metrics
-  namespace: geolocation
+  name: {{ .Values.appName }}
   labels:
     app.kubernetes.io/component: exporter
-    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/name: {{ .Values.appName }}
     app.kubernetes.io/version: 2.15.0
 rules:
 - apiGroups:
@@ -25,6 +24,7 @@ rules:
   - namespaces
   - endpoints
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -35,6 +35,7 @@ rules:
   - deployments
   - replicasets
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -43,6 +44,7 @@ rules:
   - cronjobs
   - jobs
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -50,6 +52,7 @@ rules:
   resources:
   - horizontalpodautoscalers
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -69,6 +72,7 @@ rules:
   resources:
   - poddisruptionbudgets
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -76,6 +80,7 @@ rules:
   resources:
   - certificatesigningrequests
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -83,6 +88,7 @@ rules:
   resources:
   - endpointslices
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -91,6 +97,7 @@ rules:
   - storageclasses
   - volumeattachments
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -99,6 +106,7 @@ rules:
   - mutatingwebhookconfigurations
   - validatingwebhookconfigurations
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -108,6 +116,7 @@ rules:
   - ingressclasses
   - ingresses
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -115,6 +124,7 @@ rules:
   resources:
   - leases
   verbs:
+  - get
   - list
   - watch
 - apiGroups:
@@ -125,5 +135,6 @@ rules:
   - rolebindings
   - roles
   verbs:
+  - get
   - list
   - watch

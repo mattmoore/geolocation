@@ -1,20 +1,22 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: kube-state-metrics
-  namespace: geolocation
+  name: {{ .Values.appName }}
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
     matchLabels:
-      app: kube-state-metrics
+      app.kubernetes.io/name: {{ .Values.appName }}-shard
   template:
     metadata:
       labels:
-        app: kube-state-metrics
+        app.kubernetes.io/component: exporter
+        app.kubernetes.io/name: {{ .Values.appName }}-shard
+        app.kubernetes.io/version: 2.15.0
     spec:
       containers:
-      - image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.15.0
-        name: kube-state-metrics
+      - image: {{ .Values.image }}
+        name: {{ .Values.appName }}
         args:
         - --resources=pods
         - --node=$(NODE_NAME)
@@ -24,3 +26,4 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
+      serviceAccountName: {{ .Values.appName }}
