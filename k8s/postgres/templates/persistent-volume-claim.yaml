@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ .Values.appName }}
 spec:
-  storageClassName: kind-hostpath
+  storageClassName: standard
   accessModes:
     - ReadWriteOnce
   resources:
